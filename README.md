@@ -1,12 +1,16 @@
-# My GitHub Pages Portfolio
+# Seodong (Andrew) Lim Portfolio
 
-A personal portfolio website hosted via GitHub Pages under `seodong-lim-1.github.io`.
+This repository contains the source code for my personal website, hosted via GitHub Pages at:
+
+🔗 **https://seodong-lim-1.github.io**
 
 ---
 
-##  About
+## Overview
 
-This repository contains the source files for my personal static website. It serves to showcase my projects, with two main pages:
+This is a simple static website built with HTML and CSS to showcase my work and projects.
+
+##  Structure
 
 - `index.html`: The home page of the website, includes a brief introduction, history, and skills
 - `projects.html`: A showcase of projects with links and descriptions.
@@ -14,3 +18,7 @@ This repository contains the source files for my personal static website. It ser
 - `gallery.html`: Showcasing other images, showcasing my journey.
 
 ---
+
+## Live Website
+
+Visit the live site here: [https://seodong-lim-1.github.io](https://seodong-lim-1.github.io)
