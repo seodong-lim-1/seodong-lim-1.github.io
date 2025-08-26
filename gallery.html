@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaming Gallery - Andrew Lim</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold">Andrew Lim</h1>
+      <nav class="space-x-4">
+        <a href="index.html" class="hover:text-blue-600">Home</a>
+        <a href="projects.html" class="hover:text-blue-600">Projects</a>
+        <a href="gallery.html" class="text-blue-600 font-semibold">Gallery</a>
+        <a href="index.html#contact" class="hover:text-blue-600">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Title Section -->
+  <section class="max-w-5xl mx-auto px-6 py-16 text-center">
+    <h2 class="text-4xl font-bold mb-4">🎮 Gaming Career Gallery</h2>
+    <p class="text-gray-600 text-lg">
+      A showcase of my competitive gaming journey — from tournaments to live events.
+    </p>
+  </section>
+
+  <!-- Gallery Section -->
+  <section class="max-w-6xl mx-auto px-6 pb-20">
+    <div id="gallery" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 text-center">
+      <p id="loading" class="col-span-full text-gray-500">Loading images...</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t mt-10">
+    <div class="max-w-5xl mx-auto px-6 py-6 text-center text-gray-500">
+      © <span id="year"></span> Andrew Lim — Gaming Gallery
+    </div>
+  </footer>
+
+  <script>
+   
+    document.getElementById("year").textContent = new Date().getFullYear();
+    const gallery = document.getElementById("gallery");
+    const loadingText = document.getElementById("loading");
+
+    // Fetch images automatically from the GitHub repo using GitHub API
+    fetch("https://api.github.com/repos/seodong-lim-1/seodong-lim-1.github.io/contents/images")
+      .then(response => response.json())
+      .then(files => {
+        gallery.innerHTML = ""; // Clear loading text
+
+        // Filter only images (jpg, jpeg, png, gif, webp)
+        const imageFiles = files.filter(file =>
+          file.type === "file" &&
+          /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+        );
+
+        if (imageFiles.length === 0) {
+          gallery.innerHTML = `<p class="col-span-full text-gray-500">No images found.</p>`;
+          return;
+        }
+
+        // Create gallery items
+        imageFiles.forEach(file => {
+          const div = document.createElement("div");
+          div.className = "overflow-hidden rounded-xl shadow-lg";
+
+          const img = document.createElement("img");
+          img.src = file.download_url;
+          img.alt = file.name;
+          img.className = "w-full h-64 object-cover hover:scale-105 transition";
+
+          div.appendChild(img);
+          gallery.appendChild(div);
+        });
+      })
+      .catch(error => {
+        console.error("Error loading images:", error);
+        loadingText.textContent = "⚠️ Failed to load images.";
+      });
+  </script>
+</body>
+</html>
