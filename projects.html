@@ -443,10 +443,9 @@ let snakeGameInterval;
 
 function openSnakeModal() {
   snakeModal.classList.remove("hidden");
-  setTimeout(() => {
-    snakeContent.classList.remove("opacity-0", "scale-95");
-    snakeContent.classList.add("opacity-100", "scale-100");
-  }, 10);
+  snakeModal.offsetHeight; 
+  snakeContent.classList.remove("opacity-0", "scale-95");
+  snakeContent.classList.add("opacity-100", "scale-100");
 }
 
 function closeSnakeModal() {
