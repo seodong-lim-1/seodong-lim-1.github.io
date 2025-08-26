@@ -443,11 +443,11 @@ let snakeGameInterval;
 
 function openSnakeModal() {
   snakeModal.classList.remove("hidden");
-  snakeModal.offsetHeight; 
+  snakeContent.offsetHeight; 
   snakeContent.classList.remove("opacity-0", "scale-95");
   snakeContent.classList.add("opacity-100", "scale-100");
 }
-
+  
 function closeSnakeModal() {
   snakeContent.classList.remove("opacity-100", "scale-100");
   snakeContent.classList.add("opacity-0", "scale-95");
