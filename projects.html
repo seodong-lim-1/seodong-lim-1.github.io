@@ -181,6 +181,23 @@
     </div>
   </footer>
 
+<!-- Snake Modal -->
+<div id="snakeModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center">
+  <div id="snakeContent" class="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-2xl scale-95 opacity-0 transition-all duration-300">
+    <h3 class="text-2xl font-bold mb-2">Snake Game 🐍</h3>
+    <div id="snakeScore" class="text-lg font-semibold mb-4">Score: 0</div>
+    <canvas id="snakeCanvas" width="320" height="320" class="mx-auto bg-gray-200 rounded-lg"></canvas>
+    <div class="mt-4 flex justify-center gap-4">
+      <button onclick="startSnakeGame()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
+        Start / Restart
+      </button>
+      <button onclick="closeSnakeModal()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+  
 <!-- 2048 Game Modal -->
 <div id="gameModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center">
   <div class="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-2xl scale-95 opacity-0 transition-all duration-300"
@@ -408,23 +425,6 @@
     return moved;
   }
 </script>
-
-<!-- Snake Modal -->
-<div id="snakeModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center">
-  <div id="snakeContent" class="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-2xl scale-95 opacity-0 transition-all duration-300">
-    <h3 class="text-2xl font-bold mb-2">Snake Game 🐍</h3>
-    <div id="snakeScore" class="text-lg font-semibold mb-4">Score: 0</div>
-    <canvas id="snakeCanvas" width="320" height="320" class="mx-auto bg-gray-200 rounded-lg"></canvas>
-    <div class="mt-4 flex justify-center gap-4">
-      <button onclick="startSnakeGame()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
-        Start / Restart
-      </button>
-      <button onclick="closeSnakeModal()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
-        Close
-      </button>
-    </div>
-  </div>
-</div>
 
 <script>
 const snakeModal = document.getElementById("snakeModal");
