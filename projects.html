@@ -147,7 +147,7 @@
         
         <!-- Live GIF Preview -->
         <div class="overflow-hidden rounded-lg mb-4">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Snake_Game_Play.gif" 
+          <img src="https://i.imgur.com/dAtcCfH.gif" 
                alt="Snake Gameplay" 
                class="w-full h-48 object-cover rounded-lg shadow hover:scale-105 transition-transform duration-300">
         </div>
@@ -409,19 +409,12 @@
   }
 </script>
 
-<!-- Snake Game Modal -->
+<!-- Snake Modal -->
 <div id="snakeModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center">
-  <div class="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-2xl scale-95 opacity-0 transition-all duration-300"
-       id="snakeContent">
+  <div id="snakeContent" class="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-2xl scale-95 opacity-0 transition-all duration-300">
     <h3 class="text-2xl font-bold mb-2">Snake Game 🐍</h3>
-
-    <!-- Score Display -->
     <div id="snakeScore" class="text-lg font-semibold mb-4">Score: 0</div>
-
-    <!-- Game Board -->
     <canvas id="snakeCanvas" width="320" height="320" class="mx-auto bg-gray-200 rounded-lg"></canvas>
-
-    <!-- Controls -->
     <div class="mt-4 flex justify-center gap-4">
       <button onclick="startSnakeGame()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
         Start / Restart
@@ -442,11 +435,10 @@ const scoreDisplay = document.getElementById("snakeScore");
 
 const gridSize = 16;
 const canvasSize = 320;
-let snake = [{x: 8, y: 8}];
-let direction = {x: 0, y: 0};
-let food = {x: 0, y: 0};
+let snake = [];
+let direction = {x:0, y:0};
+let food = {};
 let gameInterval;
-let startX, startY;
 let score = 0;
 
 function openSnakeModal() {
@@ -455,7 +447,6 @@ function openSnakeModal() {
     snakeContent.classList.remove("opacity-0", "scale-95");
     snakeContent.classList.add("opacity-100", "scale-100");
   }, 10);
-  startSnakeGame();
 }
 
 function closeSnakeModal() {
@@ -486,77 +477,46 @@ function updateScore() {
 
 function gameLoop() {
   const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
-
-  // Wall collision
-  if (head.x < 0 || head.x >= canvasSize / gridSize || head.y < 0 || head.y >= canvasSize / gridSize) {
+  if (head.x < 0 || head.x >= canvasSize/gridSize || head.y < 0 || head.y >= canvasSize/gridSize || snake.some(s => s.x===head.x && s.y===head.y)) {
     clearInterval(gameInterval);
     alert("Game Over! Final Score: " + score);
     return;
   }
-
-  // Self collision
-  if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-    clearInterval(gameInterval);
-    alert("Game Over! Final Score: " + score);
-    return;
-  }
-
   snake.unshift(head);
-
-  // Eat food
   if (head.x === food.x && head.y === food.y) {
     score++;
     updateScore();
     placeFood();
-  } else {
-    snake.pop();
-  }
-
+  } else snake.pop();
   drawBoard();
 }
 
 function drawBoard() {
   ctx.fillStyle = "#ccc";
-  ctx.fillRect(0, 0, canvasSize, canvasSize);
-
-  // Draw food
+  ctx.fillRect(0,0,canvasSize,canvasSize);
   ctx.fillStyle = "red";
-  ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
-
-  // Draw snake
+  ctx.fillRect(food.x*gridSize, food.y*gridSize, gridSize, gridSize);
   ctx.fillStyle = "green";
-  snake.forEach(segment => {
-    ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-  });
+  snake.forEach(s => ctx.fillRect(s.x*gridSize, s.y*gridSize, gridSize, gridSize));
 }
 
-// Arrow key controls
 document.addEventListener("keydown", (e) => {
   switch(e.key) {
-    case "ArrowUp": if (direction.y === 0) direction = {x: 0, y: -1}; break;
-    case "ArrowDown": if (direction.y === 0) direction = {x: 0, y: 1}; break;
-    case "ArrowLeft": if (direction.x === 0) direction = {x: -1, y: 0}; break;
-    case "ArrowRight": if (direction.x === 0) direction = {x: 1, y: 0}; break;
+    case "ArrowUp": if (direction.y===0) direction={x:0,y:-1}; break;
+    case "ArrowDown": if (direction.y===0) direction={x:0,y:1}; break;
+    case "ArrowLeft": if (direction.x===0) direction={x:-1,y:0}; break;
+    case "ArrowRight": if (direction.x===0) direction={x:1,y:0}; break;
   }
 });
 
-// Mobile swipe support
-snakeModal.addEventListener("touchstart", (e) => {
-  const touch = e.touches[0];
-  startX = touch.clientX;
-  startY = touch.clientY;
-});
-
-snakeModal.addEventListener("touchend", (e) => {
-  const touch = e.changedTouches[0];
-  const dx = touch.clientX - startX;
-  const dy = touch.clientY - startY;
-  const absX = Math.abs(dx);
-  const absY = Math.abs(dy);
-
-  if (Math.max(absX, absY) > 30) {
-    if (absX > absY) direction = dx > 0 ? {x:1, y:0} : {x:-1, y:0};
-    else direction = dy > 0 ? {x:0, y:1} : {x:0, y:-1};
+// Optional: mobile swipe support
+let startX, startY;
+snakeModal.addEventListener("touchstart", e=> { const t=e.touches[0]; startX=t.clientX; startY=t.clientY; });
+snakeModal.addEventListener("touchend", e=> {
+  const t=e.changedTouches[0];
+  const dx=t.clientX-startX, dy=t.clientY-startY;
+  if (Math.max(Math.abs(dx),Math.abs(dy))>30) {
+    direction = Math.abs(dx)>Math.abs(dy) ? (dx>0? {x:1,y:0}:{x:-1,y:0}) : (dy>0? {x:0,y:1}:{x:0,y:-1});
   }
 });
 </script>
