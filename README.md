@@ -1,8 +1,6 @@
 # Seodong (Andrew) Lim Portfolio
 
-This repository contains the source code for my personal website, hosted via GitHub Pages at:
-
-🔗 **https://seodong-lim-1.github.io**
+This repository contains the source code for my personal website, hosted via GitHub Pages. 
 
 ---
 
