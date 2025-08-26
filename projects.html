@@ -125,7 +125,7 @@
         </div>
       
         <p class="text-gray-600 mb-4">
-          A fully playable 2048 game built using JavaScript, HTML, and Tailwind CSS. Try it directly on the website in fullscreen mode!
+          A fully playable 2048 game built using JavaScript, HTML, and Tailwind CSS. Try it directly on the website with arrow keys as movement in fullscreen mode!
         </p>
       
         <div class="flex flex-wrap gap-2 mt-3">
@@ -180,23 +180,6 @@
       © 2025 Andrew Lim. All rights reserved.
     </div>
   </footer>
-
-<!-- Snake Modal -->
-<div id="snakeModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center">
-  <div id="snakeContent" class="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-2xl scale-95 opacity-0 transition-all duration-300">
-    <h3 class="text-2xl font-bold mb-2">Snake Game 🐍</h3>
-    <div id="snakeScore" class="text-lg font-semibold mb-4">Score: 0</div>
-    <canvas id="snakeCanvas" width="320" height="320" class="mx-auto bg-gray-200 rounded-lg"></canvas>
-    <div class="mt-4 flex justify-center gap-4">
-      <button onclick="startSnakeGame()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
-        Start / Restart
-      </button>
-      <button onclick="closeSnakeModal()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
-        Close
-      </button>
-    </div>
-  </div>
-</div>
   
 <!-- 2048 Game Modal -->
 <div id="gameModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center">
@@ -220,6 +203,7 @@
   </div>
 </div>
 
+<!-- 2048 Game code -->
 <script>
   const modal = document.getElementById("gameModal");
   const modalContent = document.getElementById("modalContent");
@@ -426,99 +410,119 @@
   }
 </script>
 
+<!-- Snake Modal -->
+<div id="snakeModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center">
+  <div id="snakeContent" class="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-2xl scale-95 opacity-0 transition-all duration-300">
+    <h3 class="text-2xl font-bold mb-2">Snake Game 🐍</h3>
+    <div id="snakeScore" class="text-lg font-semibold mb-4">Score: 0</div>
+    <canvas id="snakeCanvas" width="320" height="320" class="mx-auto bg-gray-200 rounded-lg"></canvas>
+    <div class="mt-4 flex justify-center gap-4">
+      <button onclick="startSnakeGame()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
+        Start / Restart
+      </button>
+      <button onclick="closeSnakeModal()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+ <!-- Snake game code --> 
 <script>
-const snakeModal = document.getElementById("snakeModal");
-const snakeContent = document.getElementById("snakeContent");
-const canvas = document.getElementById("snakeCanvas");
-const ctx = canvas.getContext("2d");
-const scoreDisplay = document.getElementById("snakeScore");
-
-const gridSize = 16;
-const canvasSize = 320;
-let snake = [];
-let direction = {x:0, y:0};
-let food = {};
-let snakeScoreValue = 0;     
-let snakeGameInterval; 
-
-function openSnakeModal() {
-  snakeModal.classList.remove("hidden");
-  snakeContent.offsetHeight; 
-  snakeContent.classList.remove("opacity-0", "scale-95");
-  snakeContent.classList.add("opacity-100", "scale-100");
-}
+  const snakeModal = document.getElementById("snakeModal");
+  const snakeContent = document.getElementById("snakeContent");
+  const canvas = document.getElementById("snakeCanvas");
+  const ctx = canvas.getContext("2d");
+  const scoreDisplay = document.getElementById("snakeScore");
   
-function closeSnakeModal() {
-  snakeContent.classList.remove("opacity-100", "scale-100");
-  snakeContent.classList.add("opacity-0", "scale-95");
-  clearInterval(snakeGameInterval);
-  setTimeout(() => snakeModal.classList.add("hidden"), 300);
-}
-
-function startSnakeGame() {
-  snake = [{x: 8, y: 8}];
-  direction = {x: 0, y: 0};
-  snakeScoreValue = 0;
-  updateScore();
-  placeFood();
-  clearInterval(snakeGameInterval);
-  snakeGameInterval = setInterval(gameLoop, 150);
-}
-
-function placeFood() {
-  food.x = Math.floor(Math.random() * (canvasSize / gridSize));
-  food.y = Math.floor(Math.random() * (canvasSize / gridSize));
-}
-
-function updateScore() {
-  scoreDisplay.textContent = "Score: " + snakeScoreValue;
-}
-
-function gameLoop() {
-  const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
-  if (head.x < 0 || head.x >= canvasSize/gridSize || head.y < 0 || head.y >= canvasSize/gridSize || snake.some(s => s.x===head.x && s.y===head.y)) {
-    clearInterval(snakeGameInterval);
-    alert("Game Over! Final Score: " + snakeScoreValue);
-    return;
+  const gridSize = 16;
+  const canvasSize = 320;
+  let snake = [];
+  let direction = {x:0, y:0};
+  let food = {};
+  let snakeScoreValue = 0;     
+  let snakeGameInterval; 
+  
+  function openSnakeModal() {
+    snakeModal.classList.remove("hidden");
+    setTimeout(() => {
+      snakeContent.classList.remove("opacity-0", "scale-95");
+      snakeContent.classList.add("opacity-100", "scale-100");
+    }, 10);
   }
-  snake.unshift(head);
-  if (head.x === food.x && head.y === food.y) {
-    snakeScoreValue++;
+    
+  function closeSnakeModal() {
+    snakeContent.classList.remove("opacity-100", "scale-100");
+    snakeContent.classList.add("opacity-0", "scale-95");
+    clearInterval(snakeGameInterval);
+    setTimeout(() => snakeModal.classList.add("hidden"), 300);
+  }
+  
+  function startSnakeGame() {
+    snake = [{x: 8, y: 8}];
+    direction = {x: 0, y: 0};
+    snakeScoreValue = 0;
     updateScore();
     placeFood();
-  } else snake.pop();
-  drawBoard();
-}
-
-function drawBoard() {
-  ctx.fillStyle = "#ccc";
-  ctx.fillRect(0,0,canvasSize,canvasSize);
-  ctx.fillStyle = "red";
-  ctx.fillRect(food.x*gridSize, food.y*gridSize, gridSize, gridSize);
-  ctx.fillStyle = "green";
-  snake.forEach(s => ctx.fillRect(s.x*gridSize, s.y*gridSize, gridSize, gridSize));
-}
-
-document.addEventListener("keydown", (e) => {
-  switch(e.key) {
-    case "ArrowUp": if (direction.y===0) direction={x:0,y:-1}; break;
-    case "ArrowDown": if (direction.y===0) direction={x:0,y:1}; break;
-    case "ArrowLeft": if (direction.x===0) direction={x:-1,y:0}; break;
-    case "ArrowRight": if (direction.x===0) direction={x:1,y:0}; break;
+    clearInterval(snakeGameInterval);
+    snakeGameInterval = setInterval(gameLoop, 150);
   }
-});
-
-// Optional: mobile swipe support
-let startX, startY;
-snakeModal.addEventListener("touchstart", e=> { const t=e.touches[0]; startX=t.clientX; startY=t.clientY; });
-snakeModal.addEventListener("touchend", e=> {
-  const t=e.changedTouches[0];
-  const dx=t.clientX-startX, dy=t.clientY-startY;
-  if (Math.max(Math.abs(dx),Math.abs(dy))>30) {
-    direction = Math.abs(dx)>Math.abs(dy) ? (dx>0? {x:1,y:0}:{x:-1,y:0}) : (dy>0? {x:0,y:1}:{x:0,y:-1});
+  
+  function placeFood() {
+    food.x = Math.floor(Math.random() * (canvasSize / gridSize));
+    food.y = Math.floor(Math.random() * (canvasSize / gridSize));
   }
-});
+  
+  function updateScore() {
+    scoreDisplay.textContent = "Score: " + snakeScoreValue;
+  }
+  
+  function gameLoop() {
+    const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
+    if (head.x < 0 || head.x >= canvasSize/gridSize || head.y < 0 || head.y >= canvasSize/gridSize || snake.some(s => s.x===head.x && s.y===head.y)) {
+      clearInterval(snakeGameInterval);
+      alert("Game Over! Final Score: " + snakeScoreValue);
+      return;
+    }
+    snake.unshift(head);
+    if (head.x === food.x && head.y === food.y) {
+      snakeScoreValue++;
+      updateScore();
+      placeFood();
+    } else snake.pop();
+    drawBoard();
+  }
+  
+  function drawBoard() {
+    ctx.fillStyle = "#ccc";
+    ctx.fillRect(0,0,canvasSize,canvasSize);
+    ctx.fillStyle = "red";
+    ctx.fillRect(food.x*gridSize, food.y*gridSize, gridSize, gridSize);
+    ctx.fillStyle = "green";
+    snake.forEach(s => ctx.fillRect(s.x*gridSize, s.y*gridSize, gridSize, gridSize));
+  }
+  
+  document.addEventListener("keydown", (e) => {
+    switch(e.key) {
+      case "ArrowUp": if (direction.y===0) direction={x:0,y:-1}; break;
+      case "ArrowDown": if (direction.y===0) direction={x:0,y:1}; break;
+      case "ArrowLeft": if (direction.x===0) direction={x:-1,y:0}; break;
+      case "ArrowRight": if (direction.x===0) direction={x:1,y:0}; break;
+    }
+  });
+  
+  // Optional: mobile swipe support
+  let startX, startY;
+  snakeModal.addEventListener("touchstart", e=> { const t=e.touches[0]; startX=t.clientX; startY=t.clientY; });
+  snakeModal.addEventListener("touchend", e=> {
+    const t=e.changedTouches[0];
+    const dx=t.clientX-startX, dy=t.clientY-startY;
+    if (Math.max(Math.abs(dx),Math.abs(dy))>30) {
+      direction = Math.abs(dx)>Math.abs(dy) ? (dx>0? {x:1,y:0}:{x:-1,y:0}) : (dy>0? {x:0,y:1}:{x:0,y:-1});
+    }
+  });
 </script>
+
 
 </body>
 </html>
