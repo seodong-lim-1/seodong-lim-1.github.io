@@ -431,96 +431,100 @@
 <script>
   const snakeModal = document.getElementById("snakeModal");
   const snakeContent = document.getElementById("snakeContent");
-  const canvas = document.getElementById("snakeCanvas");
-  const ctx = canvas.getContext("2d");
-  const scoreDisplay = document.getElementById("snakeScore");
-  
-  const gridSize = 16;
-  const canvasSize = 320;
-  let snake = [];
-  let direction = {x:0, y:0};
-  let food = {};
-  let snakeScoreValue = 0;     
-  let snakeGameInterval; 
-  
+  const snakeGameCanvas = document.getElementById("snakeGame");
+  const snakeCtx = snakeGameCanvas.getContext("2d");
+
+  let snake = [{ x: 160, y: 160 }];
+  let direction = { x: 16, y: 0 };
+  let food = { x: 320, y: 320 };
+  let snakeGameInterval;
+
+  // Open modal with animation
   function openSnakeModal() {
     snakeModal.classList.remove("hidden");
+
+    // Reset animation state
+    snakeContent.classList.remove("opacity-100", "scale-100");
+    snakeContent.classList.add("opacity-0", "scale-95");
+
+    // Force reflow to restart animation
+    void snakeContent.offsetWidth;
+
+    // Animate in
     setTimeout(() => {
       snakeContent.classList.remove("opacity-0", "scale-95");
       snakeContent.classList.add("opacity-100", "scale-100");
     }, 10);
-    startSnakeGame(); 
+
+    startSnakeGame();
   }
-    
+
+  // Close modal with fade-out
   function closeSnakeModal() {
     snakeContent.classList.remove("opacity-100", "scale-100");
     snakeContent.classList.add("opacity-0", "scale-95");
     clearInterval(snakeGameInterval);
-    setTimeout(() => snakeModal.classList.add("hidden"), 300);
+
+    setTimeout(() => {
+      snakeModal.classList.add("hidden");
+    }, 300);
   }
-  
+
+  // Start Snake game
   function startSnakeGame() {
-    snake = [{x: 8, y: 8}];
-    direction = {x: 0, y: 0};
-    snakeScoreValue = 0;
-    updateScore();
-    placeFood();
-    clearInterval(snakeGameInterval);
-    snakeGameInterval = setInterval(gameLoop, 150);
+    snake = [{ x: 160, y: 160 }];
+    direction = { x: 16, y: 0 };
+    food = { x: 320, y: 320 };
+    snakeGameInterval = setInterval(gameLoop, 100);
   }
-  
-  function placeFood() {
-    food.x = Math.floor(Math.random() * (canvasSize / gridSize));
-    food.y = Math.floor(Math.random() * (canvasSize / gridSize));
-  }
-  
-  function updateScore() {
-    scoreDisplay.textContent = "Score: " + snakeScoreValue;
-  }
-  
+
+  // Snake game loop
   function gameLoop() {
-    const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
-    if (head.x < 0 || head.x >= canvasSize/gridSize || head.y < 0 || head.y >= canvasSize/gridSize || snake.some(s => s.x===head.x && s.y===head.y)) {
-      clearInterval(snakeGameInterval);
-      alert("Game Over! Final Score: " + snakeScoreValue);
-      return;
-    }
+    // Move snake
+    const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
     snake.unshift(head);
+
+    // Check food collision
     if (head.x === food.x && head.y === food.y) {
-      snakeScoreValue++;
-      updateScore();
-      placeFood();
-    } else snake.pop();
-    drawBoard();
-  }
-  
-  function drawBoard() {
-    ctx.fillStyle = "#ccc";
-    ctx.fillRect(0,0,canvasSize,canvasSize);
-    ctx.fillStyle = "red";
-    ctx.fillRect(food.x*gridSize, food.y*gridSize, gridSize, gridSize);
-    ctx.fillStyle = "green";
-    snake.forEach(s => ctx.fillRect(s.x*gridSize, s.y*gridSize, gridSize, gridSize));
-  }
-  
-  document.addEventListener("keydown", (e) => {
-    switch(e.key) {
-      case "ArrowUp": if (direction.y===0) direction={x:0,y:-1}; break;
-      case "ArrowDown": if (direction.y===0) direction={x:0,y:1}; break;
-      case "ArrowLeft": if (direction.x===0) direction={x:-1,y:0}; break;
-      case "ArrowRight": if (direction.x===0) direction={x:1,y:0}; break;
+      food = {
+        x: Math.floor(Math.random() * 25) * 16,
+        y: Math.floor(Math.random() * 25) * 16
+      };
+    } else {
+      snake.pop();
     }
-  });
-  
-  // Optional: mobile swipe support
-  let startX, startY;
-  snakeModal.addEventListener("touchstart", e=> { const t=e.touches[0]; startX=t.clientX; startY=t.clientY; });
-  snakeModal.addEventListener("touchend", e=> {
-    const t=e.changedTouches[0];
-    const dx=t.clientX-startX, dy=t.clientY-startY;
-    if (Math.max(Math.abs(dx),Math.abs(dy))>30) {
-      direction = Math.abs(dx)>Math.abs(dy) ? (dx>0? {x:1,y:0}:{x:-1,y:0}) : (dy>0? {x:0,y:1}:{x:0,y:-1});
+
+    // Check collisions (walls or self)
+    if (
+      head.x < 0 ||
+      head.y < 0 ||
+      head.x >= snakeGameCanvas.width ||
+      head.y >= snakeGameCanvas.height ||
+      snake
+        .slice(1)
+        .some(segment => segment.x === head.x && segment.y === head.y)
+    ) {
+      clearInterval(snakeGameInterval);
+      alert("Game Over!");
     }
+
+    // Draw game
+    snakeCtx.fillStyle = "black";
+    snakeCtx.fillRect(0, 0, snakeGameCanvas.width, snakeGameCanvas.height);
+
+    snakeCtx.fillStyle = "lime";
+    snake.forEach(segment => snakeCtx.fillRect(segment.x, segment.y, 16, 16));
+
+    snakeCtx.fillStyle = "red";
+    snakeCtx.fillRect(food.x, food.y, 16, 16);
+  }
+
+  // Controls
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowUp" && direction.y === 0) direction = { x: 0, y: -16 };
+    if (e.key === "ArrowDown" && direction.y === 0) direction = { x: 0, y: 16 };
+    if (e.key === "ArrowLeft" && direction.x === 0) direction = { x: -16, y: 0 };
+    if (e.key === "ArrowRight" && direction.x === 0) direction = { x: 16, y: 0 };
   });
 </script>
 
