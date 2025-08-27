@@ -163,10 +163,10 @@
         </div>
       
         <!-- Play Now Button -->
-        <button onclick="openSnakeModal()" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg mt-4 transition">
-          Play Now →
-        </button>
+      <button onclick="openSnakeModal()" 
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg mt-4 transition">
+        Play Now →
+      </button>
       </div>
         
 
@@ -449,6 +449,7 @@
       snakeContent.classList.remove("opacity-0", "scale-95");
       snakeContent.classList.add("opacity-100", "scale-100");
     }, 10);
+    startSnakeGame(); 
   }
     
   function closeSnakeModal() {
