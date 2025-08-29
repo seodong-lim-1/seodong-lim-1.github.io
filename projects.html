@@ -427,30 +427,34 @@
   </div>
 </div>
 
- <!-- Snake game code --> 
+ <!-- Snake Modal -->
+<div id="snakeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div id="snakeContent" class="bg-white p-6 rounded-2xl shadow-lg transform transition duration-300 opacity-0 scale-95">
+    <h3 class="text-lg font-bold mb-4">Snake Game</h3>
+    <canvas id="snakeGame" width="400" height="400" class="border mx-auto block"></canvas>
+    <button onclick="closeSnakeModal()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Close</button>
+  </div>
+</div>
+
 <script>
   const snakeModal = document.getElementById("snakeModal");
   const snakeContent = document.getElementById("snakeContent");
   const snakeGameCanvas = document.getElementById("snakeGame");
   const snakeCtx = snakeGameCanvas.getContext("2d");
 
-  let snake = [{ x: 160, y: 160 }];
-  let direction = { x: 16, y: 0 };
-  let food = { x: 320, y: 320 };
+  let snake = [];
+  let direction = {};
+  let food = {};
   let snakeGameInterval;
 
-  // Open modal with animation
+  // Open modal
   function openSnakeModal() {
     snakeModal.classList.remove("hidden");
 
-    // Reset animation state
+    // Animate modal in
     snakeContent.classList.remove("opacity-100", "scale-100");
     snakeContent.classList.add("opacity-0", "scale-95");
-
-    // Force reflow to restart animation
-    void snakeContent.offsetWidth;
-
-    // Animate in
+    void snakeContent.offsetWidth; // reflow
     setTimeout(() => {
       snakeContent.classList.remove("opacity-0", "scale-95");
       snakeContent.classList.add("opacity-100", "scale-100");
@@ -459,10 +463,12 @@
     startSnakeGame();
   }
 
-  // Close modal with fade-out
+  // Close modal
   function closeSnakeModal() {
+    // Animate out
     snakeContent.classList.remove("opacity-100", "scale-100");
     snakeContent.classList.add("opacity-0", "scale-95");
+
     clearInterval(snakeGameInterval);
 
     setTimeout(() => {
@@ -470,21 +476,22 @@
     }, 300);
   }
 
-  // Start Snake game
+  // Start Snake
   function startSnakeGame() {
     snake = [{ x: 160, y: 160 }];
     direction = { x: 16, y: 0 };
     food = { x: 320, y: 320 };
+    clearInterval(snakeGameInterval);
     snakeGameInterval = setInterval(gameLoop, 100);
   }
 
-  // Snake game loop
+  // Game loop
   function gameLoop() {
     // Move snake
     const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
     snake.unshift(head);
 
-    // Check food collision
+    // Eat food
     if (head.x === food.x && head.y === food.y) {
       food = {
         x: Math.floor(Math.random() * 25) * 16,
@@ -494,26 +501,26 @@
       snake.pop();
     }
 
-    // Check collisions (walls or self)
+    // Collisions
     if (
       head.x < 0 ||
       head.y < 0 ||
       head.x >= snakeGameCanvas.width ||
       head.y >= snakeGameCanvas.height ||
-      snake
-        .slice(1)
-        .some(segment => segment.x === head.x && segment.y === head.y)
+      snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)
     ) {
       clearInterval(snakeGameInterval);
       alert("Game Over!");
+      closeSnakeModal();
+      return;
     }
 
-    // Draw game
+    // Draw
     snakeCtx.fillStyle = "black";
     snakeCtx.fillRect(0, 0, snakeGameCanvas.width, snakeGameCanvas.height);
 
     snakeCtx.fillStyle = "lime";
-    snake.forEach(segment => snakeCtx.fillRect(segment.x, segment.y, 16, 16));
+    snake.forEach(seg => snakeCtx.fillRect(seg.x, seg.y, 16, 16));
 
     snakeCtx.fillStyle = "red";
     snakeCtx.fillRect(food.x, food.y, 16, 16);
