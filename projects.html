@@ -322,8 +322,62 @@
     return row;
   }
 
-</script>
+  function rotateGrid(times) {
+    for (let t = 0; t < times; t++) {
+      let newGrid = Array.from({ length: 4 }, () => Array(4).fill(0));
+      for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+          newGrid[i][j] = grid[4 - j - 1][i];
+        }
+      }
+      grid = newGrid;
+    }
+  }
 
+  function moveLeft() {
+    let changed = false;
+    for (let i = 0; i < 4; i++) {
+      let newRow = slide(grid[i]);
+      if (newRow.toString() !== grid[i].toString()) changed = true;
+      grid[i] = newRow;
+    }
+    if (changed) {
+      addRandomTile();
+      updateBoard();
+    }
+  }
+
+  function moveRight() {
+    rotateGrid(2);
+    moveLeft();
+    rotateGrid(2);
+    updateBoard();
+  }
+
+  function moveUp() {
+    rotateGrid(3);
+    moveLeft();
+    rotateGrid(1);
+    updateBoard();
+  }
+
+  function moveDown() {
+    rotateGrid(1);
+    moveLeft();
+    rotateGrid(3);
+    updateBoard();
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (modal.classList.contains("hidden")) return;
+    switch (e.key) {
+      case "ArrowLeft": e.preventDefault(); moveLeft(); break;
+      case "ArrowRight": e.preventDefault(); moveRight(); break;
+      case "ArrowUp": e.preventDefault(); moveUp(); break;
+      case "ArrowDown": e.preventDefault(); moveDown(); break;
+    }
+  });
+</script>
 
 <!-- Snake Modal -->
 <div id="snakeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
