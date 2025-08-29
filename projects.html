@@ -203,7 +203,21 @@
   </div>
 </div>
 
-<!-- 2048 Game code -->
+<!-- 2048 Modal -->
+<div id="gameModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div id="modalContent" class="bg-white p-6 rounded-2xl shadow-lg transform transition duration-300 opacity-0 scale-95">
+    <h3 class="text-lg font-bold mb-4 text-center">2048 Game</h3>
+    <div class="text-lg font-semibold text-center mb-4">
+      Score: <span id="score" class="text-blue-600">0</span>
+    </div>
+    <div id="game-container" class="grid grid-cols-4 gap-2 mx-auto" style="width: 300px; height: 300px;"></div>
+    <div class="flex justify-between mt-4">
+      <button onclick="restartGame()" class="bg-green-500 text-white px-4 py-2 rounded">New Game</button>
+      <button onclick="close2048Modal()" class="bg-red-500 text-white px-4 py-2 rounded">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const modal = document.getElementById("gameModal");
   const modalContent = document.getElementById("modalContent");
@@ -217,13 +231,19 @@
       modalContent.classList.remove("opacity-0", "scale-95");
       modalContent.classList.add("opacity-100", "scale-100");
     }, 10);
-    initGame();
+    restartGame();
   }
 
   function close2048Modal() {
     modalContent.classList.remove("opacity-100", "scale-100");
     modalContent.classList.add("opacity-0", "scale-95");
     setTimeout(() => modal.classList.add("hidden"), 300);
+  }
+
+  function restartGame() {
+    score = 0;
+    document.getElementById("score").innerText = score;
+    initGame();
   }
 
   function initGame() {
@@ -283,73 +303,17 @@
     return colors[value] || "#3c3a32";
   }
 
-  function restartGame() {
-    score = 0;
-    initGame();
+  function addScore(value) {
+    score += value;
+    document.getElementById("score").innerText = score;
   }
 
-  function isGameOver() {
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        if (grid[i][j] === 0) return false;
-        if (j < 3 && grid[i][j] === grid[i][j + 1]) return false;
-        if (i < 3 && grid[i][j] === grid[i + 1][j]) return false;
-      }
-    }
-    return true;
-  }
-
-  document.addEventListener("keydown", (e) => {
-    if (modal.classList.contains("hidden")) return;
-    let moved = false;
-    switch (e.key) {
-      case "ArrowUp": moved = moveUp(); break;
-      case "ArrowDown": moved = moveDown(); break;
-      case "ArrowLeft": moved = moveLeft(); break;
-      case "ArrowRight": moved = moveRight(); break;
-    }
-    if (moved) {
-      addRandomTile();
-      updateBoard();
-      if (isGameOver()) {
-        setTimeout(() => alert("Game Over!"), 100);
-      }
-    }
-  });
-
-  // Swiping support for mobile
-  let startX, startY;
-  modal.addEventListener("touchstart", (e) => {
-    const touch = e.touches[0];
-    startX = touch.clientX;
-    startY = touch.clientY;
-  });
-  modal.addEventListener("touchend", (e) => {
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - startX;
-    const dy = touch.clientY - startY;
-    const absX = Math.abs(dx);
-    const absY = Math.abs(dy);
-    if (Math.max(absX, absY) > 30) {
-      let moved = false;
-      if (absX > absY) moved = dx > 0 ? moveRight() : moveLeft();
-      else moved = dy > 0 ? moveDown() : moveUp();
-      if (moved) {
-        addRandomTile();
-        updateBoard();
-        if (isGameOver()) {
-          setTimeout(() => alert("Game Over!"), 100);
-        }
-      }
-    }
-  });
-
-  // Movement logic
   function slide(row) {
     row = row.filter(num => num !== 0);
     for (let i = 0; i < row.length - 1; i++) {
       if (row[i] === row[i + 1]) {
         row[i] *= 2;
+        addScore(row[i]);
         row[i + 1] = 0;
       }
     }
@@ -358,62 +322,16 @@
     return row;
   }
 
-  function moveLeft() {
-    let moved = false;
-    for (let i = 0; i < 4; i++) {
-      const newRow = slide(grid[i]);
-      if (grid[i].toString() !== newRow.toString()) moved = true;
-      grid[i] = newRow;
-    }
-    updateBoard();
-    return moved;
-  }
-
-  function moveRight() {
-    let moved = false;
-    for (let i = 0; i < 4; i++) {
-      let reversed = [...grid[i]].reverse();
-      reversed = slide(reversed).reverse();
-      if (grid[i].toString() !== reversed.toString()) moved = true;
-      grid[i] = reversed;
-    }
-    updateBoard();
-    return moved;
-  }
-
-  function moveUp() {
-    let moved = false;
-    for (let j = 0; j < 4; j++) {
-      let col = [grid[0][j], grid[1][j], grid[2][j], grid[3][j]];
-      const newCol = slide(col);
-      for (let i = 0; i < 4; i++) {
-        if (grid[i][j] !== newCol[i]) moved = true;
-        grid[i][j] = newCol[i];
-      }
-    }
-    updateBoard();
-    return moved;
-  }
-
-  function moveDown() {
-    let moved = false;
-    for (let j = 0; j < 4; j++) {
-      let col = [grid[0][j], grid[1][j], grid[2][j], grid[3][j]].reverse();
-      col = slide(col).reverse();
-      for (let i = 0; i < 4; i++) {
-        if (grid[i][j] !== col[i]) moved = true;
-        grid[i][j] = col[i];
-      }
-    }
-    updateBoard();
-    return moved;
-  }
 </script>
+
 
 <!-- Snake Modal -->
 <div id="snakeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
   <div id="snakeContent" class="bg-white p-6 rounded-2xl shadow-lg transform transition duration-300 opacity-0 scale-95">
-    <h3 class="text-lg font-bold mb-4">Snake Game</h3>
+    <h3 class="text-lg font-bold mb-4 text-center">Snake Game</h3>
+    <div class="text-lg font-semibold text-center mb-4">
+      Score: <span id="snake-score" class="text-green-600">0</span>
+    </div>
     <canvas id="snakeCanvas" width="400" height="400" class="border mx-auto block bg-black"></canvas>
     <button onclick="closeSnakeModal()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Close</button>
   </div>
@@ -425,27 +343,19 @@
   const canvas = document.getElementById("snakeCanvas");
   const ctx = canvas.getContext("2d");
 
-  let snake, direction, food, gameInterval;
+  let snake, direction, food, gameInterval, snakeScore;
 
   function openSnakeModal() {
     snakeModal.classList.remove("hidden");
-
-    // animation in
-    snakeContent.classList.remove("opacity-100", "scale-100");
-    snakeContent.classList.add("opacity-0", "scale-95");
-    void snakeContent.offsetWidth;
     setTimeout(() => {
       snakeContent.classList.remove("opacity-0", "scale-95");
       snakeContent.classList.add("opacity-100", "scale-100");
     }, 10);
-
     startGame();
   }
 
   function closeSnakeModal() {
     clearInterval(gameInterval);
-
-    // animation out
     snakeContent.classList.remove("opacity-100", "scale-100");
     snakeContent.classList.add("opacity-0", "scale-95");
     setTimeout(() => {
@@ -457,17 +367,19 @@
     snake = [{ x: 160, y: 160 }];
     direction = { x: 16, y: 0 };
     food = { x: 80, y: 80 };
+    snakeScore = 0;
+    document.getElementById("snake-score").innerText = snakeScore;
     clearInterval(gameInterval);
     gameInterval = setInterval(gameLoop, 100);
   }
 
   function gameLoop() {
-    // move snake
     const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
     snake.unshift(head);
 
-    // check food
     if (head.x === food.x && head.y === food.y) {
+      snakeScore += 10;
+      document.getElementById("snake-score").innerText = snakeScore;
       food = {
         x: Math.floor(Math.random() * 25) * 16,
         y: Math.floor(Math.random() * 25) * 16
@@ -476,19 +388,17 @@
       snake.pop();
     }
 
-    // check collisions
     if (
       head.x < 0 || head.y < 0 ||
       head.x >= canvas.width || head.y >= canvas.height ||
       snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)
     ) {
       clearInterval(gameInterval);
-      alert("Game Over!");
+      alert("Game Over! Final Score: " + snakeScore);
       closeSnakeModal();
       return;
     }
 
-    // draw
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -499,7 +409,6 @@
     ctx.fillRect(food.x, food.y, 16, 16);
   }
 
-  // controls
   document.addEventListener("keydown", e => {
     if (e.key === "ArrowUp" && direction.y === 0) direction = { x: 0, y: -16 };
     if (e.key === "ArrowDown" && direction.y === 0) direction = { x: 0, y: 16 };
@@ -507,6 +416,7 @@
     if (e.key === "ArrowRight" && direction.x === 0) direction = { x: 16, y: 0 };
   });
 </script>
+
 
 
 </body>
